@@ -57,19 +57,43 @@ img {
     animation: fadeIn 2s forwards;
 }
 
-#yesBtn {
+.button-container {
     display: none;
+    margin-top: 30px;
+    gap: 20px;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+#yesBtn, #noBtn {
     padding: 15px 30px;
     font-size: 1.8em;
     color: white;
-    background-color: #ff3366;
     border: none;
     border-radius: 10px;
     cursor: pointer;
-    margin-top: 20px;
+    transition: all 0.3s ease;
 }
 
-#yesBtn:hover { background-color: #ff6699; }
+#yesBtn {
+    background-color: #ff3366;
+}
+
+#yesBtn:hover { 
+    background-color: #ff6699;
+    transform: scale(1.1);
+}
+
+#noBtn {
+    background-color: #999;
+    position: absolute;
+    transition: all 0.2s ease;
+}
+
+#noBtn:hover {
+    background-color: #777;
+}
 
 #finalMessage {
     display: none;
@@ -78,6 +102,120 @@ img {
     margin-top: 20px;
     text-shadow: 2px 2px 10px #fff;
     animation: fadeIn 2s forwards;
+}
+
+/* Puzzle Modal Styles */
+.puzzle-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.puzzle-content {
+    background: linear-gradient(135deg, #ff99cc, #ffcccc);
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 0 50px rgba(255, 51, 102, 0.5);
+    max-width: 500px;
+    width: 90%;
+    animation: slideIn 0.5s forwards;
+}
+
+.puzzle-title {
+    font-size: 2em;
+    color: #ff0066;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 5px rgba(255, 255, 255, 0.5);
+}
+
+.puzzle-hint {
+    font-size: 1.2em;
+    color: #ff3366;
+    margin: 20px 0;
+    line-height: 1.6;
+}
+
+.puzzle-input {
+    width: 100%;
+    padding: 15px;
+    font-size: 1.3em;
+    border: 3px solid #ff3366;
+    border-radius: 10px;
+    margin: 20px 0;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+.puzzle-submit {
+    padding: 15px 40px;
+    font-size: 1.5em;
+    background-color: #ff3366;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.puzzle-submit:hover {
+    background-color: #ff6699;
+    transform: scale(1.05);
+}
+
+.secret-message {
+    display: none;
+    font-size: 1.5em;
+    color: #fff;
+    background: linear-gradient(45deg, #ff0066, #ff3366);
+    padding: 30px;
+    border-radius: 15px;
+    margin-top: 20px;
+    line-height: 1.8;
+    animation: glow 2s infinite;
+}
+
+@keyframes glow {
+    0%, 100% { box-shadow: 0 0 20px #ff3366; }
+    50% { box-shadow: 0 0 40px #ff0066; }
+}
+
+@keyframes slideIn {
+    from { transform: scale(0.5); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.wrong-answer {
+    color: #ff0066;
+    font-size: 1.1em;
+    margin-top: 10px;
+    display: none;
+}
+
+/* Pop-up styles */
+.popup {
+    position: fixed;
+    background: white;
+    padding: 20px 30px;
+    border-radius: 15px;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.3);
+    z-index: 999;
+    animation: popupBounce 0.5s ease;
+    font-size: 1.3em;
+    color: #ff0066;
+    font-weight: bold;
+}
+
+@keyframes popupBounce {
+    0% { transform: scale(0); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
 }
 
 @keyframes fadeIn {
@@ -116,6 +254,15 @@ img {
 }
 
 canvas { position: absolute; top: 0; left: 0; z-index: 10; pointer-events: none; }
+
+@media (max-width: 600px) {
+    h1 { font-size: 2em; }
+    #welcomeMessage, #countdown { font-size: 1.5em; }
+    #proposal { font-size: 1.5em; }
+    #yesBtn, #noBtn { font-size: 1.5em; padding: 12px 25px; }
+    .puzzle-content { padding: 20px; }
+    .puzzle-title { font-size: 1.5em; }
+}
 </style>
 </head>
 <body>
@@ -126,8 +273,43 @@ canvas { position: absolute; top: 0; left: 0; z-index: 10; pointer-events: none;
 <h1>Sexy ❤️, tap me!</h1>
 <img src="https://images.unsplash.com/photo-1605902711622-cfb43c4431e0?auto=format&fit=crop&w=500&q=80" alt="Valentine's Image">
 <div id="proposal">Will you be my Valentine? 💖</div>
-<button id="yesBtn" onclick="showFinal()">Yes! 💕</button>
+
+<div class="button-container" id="buttonContainer">
+    <button id="yesBtn" onclick="showFinal()">Yes! 💕</button>
+    <button id="noBtn" onmouseover="moveButton()" ontouchstart="moveButton()">No 😢</button>
+</div>
+
 <div id="finalMessage">I'm yours forever! 💖</div>
+
+<!-- Puzzle Modal -->
+<div class="puzzle-modal" id="puzzleModal">
+    <div class="puzzle-content">
+        <div class="puzzle-title">🔐 One Last Thing... 💕</div>
+        <div class="puzzle-hint">
+            Solve this riddle to unlock your secret message:<br><br>
+            <em>"I have no voice, yet I speak to you.<br>
+            I tell of all things in the world that people do.<br>
+            I have leaves, but I am not a tree.<br>
+            I have a spine, but no bones in me.<br>
+            What am I?"</em><br><br>
+            💡 Hint: You're holding our story...
+        </div>
+        <input type="text" id="puzzleInput" class="puzzle-input" placeholder="Type your answer..." maxlength="10">
+        <div class="wrong-answer" id="wrongAnswer">❌ Not quite! Think about our memories... 💭</div>
+        <button class="puzzle-submit" onclick="checkPuzzle()">Unlock Secret 💖</button>
+        <div class="secret-message" id="secretMessage">
+            ✨ <strong>SECRET MESSAGE UNLOCKED</strong> ✨<br><br>
+            "Every page of our story together is my favorite chapter.<br>
+            From the first moment I saw you, I knew you were the one.<br>
+            You are my past, my present, and my forever future.<br>
+            This isn't just a Valentine's proposal...<br>
+            It's a promise to write our story together, one beautiful day at a time.<br><br>
+            I love you more than words can say. 📖💕<br>
+            Forever yours,<br>
+            Your Valentine 💋"
+        </div>
+    </div>
+</div>
 
 <audio id="loveSong" loop>
     <source src="https://www.bensound.com/bensound-music/bensound-romantic.mp3" type="audio/mpeg">
@@ -142,20 +324,35 @@ const welcomeMessage = document.getElementById('welcomeMessage');
 const countdownEl = document.getElementById('countdown');
 const title = document.querySelector('h1');
 const img = document.querySelector('img');
+const buttonContainer = document.getElementById('buttonContainer');
+const noBtn = document.getElementById('noBtn');
+const yesBtn = document.getElementById('yesBtn');
+const puzzleModal = document.getElementById('puzzleModal');
+const puzzleInput = document.getElementById('puzzleInput');
+const wrongAnswer = document.getElementById('wrongAnswer');
+const secretMessage = document.getElementById('secretMessage');
 
 let started = false;
+let noClickCount = 0;
+
+// Pop-up messages when hovering over No
+const noPopups = [
+    "Wrong choice! 😱",
+    "Think again! 💭",
+    "Are you sure about that? 🤔",
+    "My heart is breaking! 💔",
+    "Please reconsider! 🥺",
+    "Don't do this! 😢",
+    "You're breaking my heart! 💔"
+];
 
 function startExperience() {
     if (started) return;
     started = true;
 
-    // Play music
     music.play().catch(()=>{});
-
-    // Hide welcome message
     welcomeMessage.style.display = 'none';
 
-    // Start countdown
     let countdown = 3;
     countdownEl.style.display = 'block';
     countdownEl.textContent = countdown;
@@ -166,14 +363,102 @@ function startExperience() {
         } else {
             clearInterval(interval);
             countdownEl.style.display='none';
-            // Show proposal
             title.style.display = 'block';
             img.style.display = 'block';
             document.getElementById('proposal').style.display = 'block';
-            document.getElementById('yesBtn').style.display = 'inline-block';
+            buttonContainer.style.display = 'flex';
         }
     }, 1000);
 }
+
+// Show pop-up message
+function showPopup(message) {
+    const popup = document.createElement('div');
+    popup.className = 'popup';
+    popup.textContent = message;
+    popup.style.left = Math.random() * (window.innerWidth - 200) + 'px';
+    popup.style.top = Math.random() * (window.innerHeight - 100) + 'px';
+    document.body.appendChild(popup);
+    
+    setTimeout(() => {
+        popup.style.animation = 'fadeOut 0.5s forwards';
+        setTimeout(() => popup.remove(), 500);
+    }, 2000);
+}
+
+// Move the No button away
+function moveButton() {
+    noClickCount++;
+    
+    // Show random popup
+    const randomPopup = noPopups[Math.floor(Math.random() * noPopups.length)];
+    showPopup(randomPopup);
+    
+    // Make Yes button bigger each time No is approached
+    const newSize = 1.8 + (noClickCount * 0.3);
+    yesBtn.style.fontSize = newSize + 'em';
+    
+    // Random position for No button
+    const maxX = window.innerWidth - 200;
+    const maxY = window.innerHeight - 100;
+    const randomX = Math.random() * maxX;
+    const randomY = Math.random() * maxY;
+    
+    noBtn.style.left = randomX + 'px';
+    noBtn.style.top = randomY + 'px';
+    
+    // Change No button text based on attempts
+    const messages = [
+        "No 😢",
+        "Are you sure? 🥺",
+        "Really? 😭",
+        "Please? 💔",
+        "Think again! 😢",
+        "Don't be mean! 😿",
+        "Last chance! 💕",
+        "I'm begging! 🙏",
+        "Pretty please? 🥹"
+    ];
+    
+    if (noClickCount < messages.length) {
+        noBtn.textContent = messages[noClickCount];
+    } else {
+        noBtn.textContent = "Fine... 😭";
+        noBtn.style.fontSize = '0.8em';
+    }
+}
+
+// Check puzzle answer
+function checkPuzzle() {
+    const answer = puzzleInput.value.trim().toUpperCase();
+    // Answer is "BOOK"
+    if (answer === 'BOOK') {
+        wrongAnswer.style.display = 'none';
+        puzzleInput.style.display = 'none';
+        document.querySelector('.puzzle-submit').style.display = 'none';
+        document.querySelector('.puzzle-hint').style.display = 'none';
+        secretMessage.style.display = 'block';
+        
+        // Extra fireworks for solving puzzle
+        for(let i=0;i<25;i++){
+            setTimeout(() => {
+                fireworks.push(new Firework(Math.random()*canvas.width, canvas.height, Math.random()*canvas.height/2));
+            }, i * 150);
+        }
+    } else {
+        wrongAnswer.style.display = 'block';
+        puzzleInput.value = '';
+        puzzleInput.style.borderColor = '#ff0066';
+        showPopup("Not quite! Keep trying! 💭");
+    }
+}
+
+// Allow Enter key to submit puzzle
+puzzleInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        checkPuzzle();
+    }
+});
 
 // Floating hearts in background
 function createHeart() {
@@ -236,7 +521,6 @@ class Particle {
     }
 }
 
-// Draw heart shape
 function drawHeart(x, y, size, color){
     ctx.save();
     ctx.translate(x, y);
@@ -252,7 +536,6 @@ function drawHeart(x, y, size, color){
     ctx.restore();
 }
 
-// Create heart + confetti particles
 function createHeartParticles(x, y){
     for(let i=0;i<30;i++){
         let color = `hsl(${Math.random()*360},100%,70%)`;
@@ -275,16 +558,26 @@ function animate(){
 animate();
 
 function showFinal(){
+    buttonContainer.style.display = 'none';
     document.getElementById('finalMessage').style.display='block';
+    document.getElementById('proposal').style.display='none';
+    
+    // Launch fireworks
     for(let i=0;i<15;i++){
-        fireworks.push(new Firework(Math.random()*canvas.width, canvas.height, Math.random()*canvas.height/2));
+        setTimeout(() => {
+            fireworks.push(new Firework(Math.random()*canvas.width, canvas.height, Math.random()*canvas.height/2));
+        }, i * 200);
     }
-    alert("You said YES! 💖");
+    
+    // Show puzzle after 2 seconds
+    setTimeout(() => {
+        puzzleModal.style.display = 'flex';
+    }, 2000);
 }
 
 // Tap hearts for mobile
 function tapHeart(e){
-    startExperience(); // First tap starts music & countdown
+    startExperience();
     const heart = document.createElement('div');
     heart.classList.add('heart');
     const x = e.clientX || e.touches[0].clientX;
