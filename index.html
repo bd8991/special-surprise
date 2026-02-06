@@ -5,11 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Valentine's Proposal</title>
 <style>
-* {
-    -webkit-user-select: none;
-    user-select: none;
-}
-
 body {
     margin: 0;
     padding: 0;
@@ -37,26 +32,6 @@ body {
     z-index: 5;
 }
 
-#musicPrompt {
-    position: absolute;
-    top: 40%;
-    font-size: 1.2em;
-    color: #ff3366;
-    background: white;
-    padding: 15px 30px;
-    border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-    display: none;
-    z-index: 20;
-    cursor: pointer;
-    animation: pulse 1.5s infinite;
-}
-
-@keyframes pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-}
-
 h1 {
     color: #ff0066;
     font-size: 3em;
@@ -68,7 +43,6 @@ h1 {
 
 img {
     width: 300px;
-    max-width: 90%;
     border-radius: 20px;
     margin-bottom: 20px;
     box-shadow: 0px 0px 30px #ff99cc;
@@ -93,18 +67,9 @@ img {
     border-radius: 10px;
     cursor: pointer;
     margin-top: 20px;
-    transition: all 0.3s ease;
 }
 
-#yesBtn:hover { 
-    background-color: #ff6699;
-    transform: scale(1.1);
-}
-
-#yesBtn:focus {
-    outline: 3px solid #ff99cc;
-    outline-offset: 3px;
-}
+#yesBtn:hover { background-color: #ff6699; }
 
 #finalMessage {
     display: none;
@@ -150,30 +115,16 @@ img {
     100% { transform: translateY(-100vh) rotate(-45deg); opacity: 0;}
 }
 
-canvas { 
-    position: absolute; 
-    top: 0; 
-    left: 0; 
-    z-index: 10; 
-    pointer-events: none; 
-}
-
-@media (max-width: 600px) {
-    h1 { font-size: 2em; }
-    #welcomeMessage, #countdown { font-size: 1.5em; }
-    #proposal { font-size: 1.5em; }
-    #yesBtn { font-size: 1.5em; }
-}
+canvas { position: absolute; top: 0; left: 0; z-index: 10; pointer-events: none; }
 </style>
 </head>
 <body>
 
 <div id="welcomeMessage">Hey Sexy ❤️, I have a surprise for you… Tap anywhere!</div>
 <div id="countdown"></div>
-<div id="musicPrompt">🎵 Tap to enable music 🎵</div>
 
 <h1>Sexy ❤️, tap me!</h1>
-<img src="https://images.unsplash.com/photo-1605902711622-cfb43c4431e0?auto=format&fit=crop&w=500&q=80" alt="Beautiful romantic Valentine's scene with hearts and roses">
+<img src="https://images.unsplash.com/photo-1605902711622-cfb43c4431e0?auto=format&fit=crop&w=500&q=80" alt="Valentine's Image">
 <div id="proposal">Will you be my Valentine? 💖</div>
 <button id="yesBtn" onclick="showFinal()">Yes! 💕</button>
 <div id="finalMessage">I'm yours forever! 💖</div>
@@ -189,24 +140,22 @@ canvas {
 const music = document.getElementById('loveSong');
 const welcomeMessage = document.getElementById('welcomeMessage');
 const countdownEl = document.getElementById('countdown');
-const musicPrompt = document.getElementById('musicPrompt');
 const title = document.querySelector('h1');
 const img = document.querySelector('img');
 
 let started = false;
-let heartCount = 0;
-const MAX_HEARTS = 30;
 
 function startExperience() {
     if (started) return;
     started = true;
 
-    music.play().catch(()=>{
-        musicPrompt.style.display = 'block';
-    });
+    // Play music
+    music.play().catch(()=>{});
 
+    // Hide welcome message
     welcomeMessage.style.display = 'none';
 
+    // Start countdown
     let countdown = 3;
     countdownEl.style.display = 'block';
     countdownEl.textContent = countdown;
@@ -217,49 +166,30 @@ function startExperience() {
         } else {
             clearInterval(interval);
             countdownEl.style.display='none';
+            // Show proposal
             title.style.display = 'block';
             img.style.display = 'block';
             document.getElementById('proposal').style.display = 'block';
             document.getElementById('yesBtn').style.display = 'inline-block';
         }
     }, 1000);
-
-    window.removeEventListener('click', initialTapHandler);
-    window.removeEventListener('touchstart', initialTapHandler);
-
-    window.addEventListener('click', createTapHeart);
-    window.addEventListener('touchstart', createTapHeart);
 }
 
-musicPrompt.addEventListener('click', ()=>{
-    music.play();
-    musicPrompt.style.display = 'none';
-});
-
+// Floating hearts in background
 function createHeart() {
-    if (heartCount >= MAX_HEARTS) return;
-    
-    heartCount++;
     const heart = document.createElement('div');
     heart.classList.add('heart');
     heart.style.left = Math.random() * window.innerWidth + 'px';
     heart.style.animationDuration = 4 + Math.random() * 3 + 's';
-    const size = 10 + Math.random() * 20;
-    heart.style.width = size + 'px';
-    heart.style.height = size + 'px';
-    
-    const hue = Math.random() * 60 + 330;
-    heart.style.backgroundColor = `hsl(${hue},70%,60%)`;
-    
+    heart.style.width = 10 + Math.random() * 20 + 'px';
+    heart.style.height = heart.style.width;
+    heart.style.backgroundColor = `hsl(${Math.random()*360},70%,60%)`;
     document.body.appendChild(heart);
-    setTimeout(() => {
-        heart.remove();
-        heartCount--;
-    }, 7000);
+    setTimeout(() => heart.remove(), 7000);
 }
+setInterval(createHeart, 300);
 
-const heartInterval = setInterval(createHeart, 400);
-
+// Fireworks canvas
 const canvas = document.getElementById('fireworks');
 const ctx = canvas.getContext('2d');
 canvas.width = window.innerWidth;
@@ -270,147 +200,107 @@ let particles = [];
 
 class Firework {
     constructor(x, y, targetY, color='') {
-        this.x = x; 
-        this.y = y; 
-        this.targetY = targetY;
-        this.speed = 4 + Math.random() * 2;
+        this.x=x; this.y=y; this.targetY=targetY;
+        this.speed=4+Math.random()*2;
         this.color = color || `hsl(${Math.random()*360},100%,50%)`;
     }
     update() {
-        this.y -= this.speed;
-        if(this.y <= this.targetY){
+        this.y-=this.speed;
+        if(this.y<=this.targetY){
             createHeartParticles(this.x, this.y);
             return false;
         }
         return true;
     }
-    draw(){ 
-        ctx.fillStyle = this.color; 
-        ctx.fillRect(this.x, this.y, 2, 10);
-    }
+    draw(){ ctx.fillStyle=this.color; ctx.fillRect(this.x,this.y,2,10);}
 }
 
 class Particle {
-    constructor(x, y, color, shape='circle'){
-        this.x = x; 
-        this.y = y; 
-        this.color = color;
-        this.speedX = (Math.random() - 0.5) * 6;
-        this.speedY = (Math.random() - 0.5) * 6;
-        this.alpha = 1;
+    constructor(x,y,color,shape='circle'){
+        this.x=x; this.y=y; this.color=color;
+        this.speedX=(Math.random()-0.5)*6;
+        this.speedY=(Math.random()-0.5)*6;
+        this.alpha=1;
         this.shape = shape;
-        this.size = shape === 'heart' ? 8 : 3;
     }
-    update(){ 
-        this.x += this.speedX; 
-        this.y += this.speedY; 
-        this.speedY += 0.1;
-        this.alpha -= 0.015; 
-        return this.alpha > 0;
-    }
+    update(){ this.x+=this.speedX; this.y+=this.speedY; this.alpha-=0.02; return this.alpha>0;}
     draw(){
-        ctx.globalAlpha = this.alpha;
-        ctx.fillStyle = this.color;
-        if(this.shape === 'heart'){
-            drawHeart(this.x, this.y, this.size, this.color);
+        ctx.globalAlpha=this.alpha;
+        ctx.fillStyle=this.color;
+        if(this.shape==='heart'){
+            drawHeart(this.x,this.y,5,this.color);
         } else {
-            ctx.fillRect(this.x, this.y, this.size, this.size);
+            ctx.fillRect(this.x,this.y,3,3);
         }
-        ctx.globalAlpha = 1;
+        ctx.globalAlpha=1;
     }
 }
 
+// Draw heart shape
 function drawHeart(x, y, size, color){
     ctx.save();
-    ctx.fillStyle = color;
     ctx.translate(x, y);
-    ctx.scale(size / 10, size / 10);
-    
+    ctx.rotate(-Math.PI/4);
+    ctx.fillStyle = color;
     ctx.beginPath();
-    ctx.moveTo(0, 3);
-    ctx.bezierCurveTo(-5, -2, -10, 1, -5, 8);
-    ctx.bezierCurveTo(-3, 10, 0, 12, 0, 12);
-    ctx.bezierCurveTo(0, 12, 3, 10, 5, 8);
-    ctx.bezierCurveTo(10, 1, 5, -2, 0, 3);
-    ctx.closePath();
+    ctx.moveTo(0,0);
+    ctx.fillRect(0,0,size,size);
+    ctx.fillRect(-size,0,size,size);
+    ctx.arc(-size/2, -size/2, size/2, 0, Math.PI*2);
+    ctx.arc(size/2, -size/2, size/2, 0, Math.PI*2);
     ctx.fill();
-    
     ctx.restore();
 }
 
+// Create heart + confetti particles
 function createHeartParticles(x, y){
-    for(let i = 0; i < 20; i++){
-        let color = `hsl(${Math.random() * 60 + 330},100%,70%)`;
-        particles.push(new Particle(x, y, color, 'heart'));
+    for(let i=0;i<30;i++){
+        let color = `hsl(${Math.random()*360},100%,70%)`;
+        particles.push(new Particle(x,y,color,'heart'));
     }
-    for(let i = 0; i < 40; i++){
-        let color = `hsl(${Math.random() * 360},100%,70%)`;
-        particles.push(new Particle(x, y, color, 'circle'));
+    for(let i=0;i<50;i++){
+        let color = `hsl(${Math.random()*360},100%,70%)`;
+        particles.push(new Particle(x,y,color,'circle'));
     }
 }
 
 function animate(){
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    fireworks = fireworks.filter(f => f.update());
-    fireworks.forEach(f => f.draw());
-    particles = particles.filter(p => p.update());
-    particles.forEach(p => p.draw());
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    fireworks = fireworks.filter(f=>f.update());
+    fireworks.forEach(f=>f.draw());
+    particles = particles.filter(p=>p.update());
+    particles.forEach(p=>p.draw());
     requestAnimationFrame(animate);
 }
-anime();
+animate();
 
 function showFinal(){
-    document.getElementById('finalMessage').style.display = 'block';
-    
-    for(let i = 0; i < 20; i++){
-        setTimeout(() => {
-            fireworks.push(new Firework(
-                Math.random() * canvas.width, 
-                canvas.height, 
-                Math.random() * canvas.height / 2
-            ));
-        }, i * 200);
+    document.getElementById('finalMessage').style.display='block';
+    for(let i=0;i<15;i++){
+        fireworks.push(new Firework(Math.random()*canvas.width, canvas.height, Math.random()*canvas.height/2));
     }
-    
-    setTimeout(() => {
-        alert("You said YES! 💖");
-    }, 500);
+    alert("You said YES! 💖");
 }
 
-function createTapHeart(e) {
-    e.preventDefault();
+// Tap hearts for mobile
+function tapHeart(e){
+    startExperience(); // First tap starts music & countdown
     const heart = document.createElement('div');
     heart.classList.add('heart');
-    const x = e.clientX || (e.touches && e.touches[0].clientX);
-    const y = e.clientY || (e.touches && e.touches[0].clientY);
+    const x = e.clientX || e.touches[0].clientX;
+    const y = e.clientY || e.touches[0].clientY;
     heart.style.left = x - 10 + 'px';
     heart.style.top = y - 10 + 'px';
     heart.style.width = '20px';
     heart.style.height = '20px';
-    const hue = Math.random() * 60 + 330;
-    heart.style.backgroundColor = `hsl(${hue},70%,60%)`;
+    heart.style.backgroundColor = `hsl(${Math.random()*360},70%,60%)`;
     document.body.appendChild(heart);
-    setTimeout(() => heart.remove(), 2000);
+    setTimeout(()=>heart.remove(),2000);
 }
 
-function initialTapHandler(e) {
-    startExperience();
-    createTapHeart(e);
-}
-
-window.addEventListener('click', initialTapHandler);
-window.addEventListener('touchstart', initialTapHandler);
-
-window.addEventListener('resize', () => { 
-    canvas.width = window.innerWidth; 
-    canvas.height = window.innerHeight; 
-});
-
-document.getElementById('yesBtn').addEventListener('keypress', (e) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-        showFinal();
-    }
-});
+window.addEventListener('click', tapHeart);
+window.addEventListener('touchstart', tapHeart);
+window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
 </script>
 
 </body>
