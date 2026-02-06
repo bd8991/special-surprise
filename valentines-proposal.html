@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Valentine's Proposal</title>
+<style>
+* {
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(to bottom right, #ffcccc, #ff99cc);
+    font-family: 'Arial', sans-serif;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    height: 100vh;
+    text-align: center;
+    position: relative;
+    touch-action: none;
+}
+
+#welcomeMessage, #countdown {
+    position: absolute;
+    top: 30%;
+    font-size: 2em;
+    color: #ff0066;
+    text-shadow: 2px 2px 10px #fff;
+    opacity: 0;
+    animation: fadeIn 2s forwards;
+    z-index: 5;
+}
+
+#musicPrompt {
+    position: absolute;
+    top: 40%;
+    font-size: 1.2em;
+    color: #ff3366;
+    background: white;
+    padding: 15px 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    display: none;
+    z-index: 20;
+    cursor: pointer;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+h1 {
+    color: #ff0066;
+    font-size: 3em;
+    margin-bottom: 20px;
+    cursor: pointer;
+    text-shadow: 2px 2px 10px #fff;
+    display: none;
+}
+
+img {
+    width: 300px;
+    max-width: 90%;
+    border-radius: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0px 0px 30px #ff99cc;
+    display: none;
+}
+
+#proposal {
+    display: none;
+    font-size: 2em;
+    color: #ff0066;
+    margin-top: 20px;
+    animation: fadeIn 2s forwards;
+}
+
+#yesBtn {
+    display: none;
+    padding: 15px 30px;
+    font-size: 1.8em;
+    color: white;
+    background-color: #ff3366;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: all 0.3s ease;
+}
+
+#yesBtn:hover { 
+    background-color: #ff6699;
+    transform: scale(1.1);
+}
+
+#yesBtn:focus {
+    outline: 3px solid #ff99cc;
+    outline-offset: 3px;
+}
+
+#finalMessage {
+    display: none;
+    font-size: 2.5em;
+    color: #ff0066;
+    margin-top: 20px;
+    text-shadow: 2px 2px 10px #fff;
+    animation: fadeIn 2s forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.8);}
+    to { opacity: 1; transform: scale(1);}
+}
+
+.heart {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background-color: #ff3366;
+    transform: rotate(-45deg);
+    animation: floatUp linear infinite;
+    border-radius: 5px;
+    pointer-events: none;
+    z-index: 5;
+}
+
+.heart::before,
+.heart::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background-color: #ff3366;
+    border-radius: 50%;
+}
+
+.heart::before { top: -10px; left: 0; }
+.heart::after { left: 10px; top: 0; }
+
+@keyframes floatUp {
+    0% { transform: translateY(0) rotate(-45deg); opacity: 1;}
+    100% { transform: translateY(-100vh) rotate(-45deg); opacity: 0;}
+}
+
+canvas { 
+    position: absolute; 
+    top: 0; 
+    left: 0; 
+    z-index: 10; 
+    pointer-events: none; 
+}
+
+@media (max-width: 600px) {
+    h1 { font-size: 2em; }
+    #welcomeMessage, #countdown { font-size: 1.5em; }
+    #proposal { font-size: 1.5em; }
+    #yesBtn { font-size: 1.5em; }
+}
+</style>
+</head>
+<body>
+
+<div id="welcomeMessage">Hey Sexy ❤️, I have a surprise for you… Tap anywhere!</div>
+<div id="countdown"></div>
+<div id="musicPrompt">🎵 Tap to enable music 🎵</div>
+
+<h1>Sexy ❤️, tap me!</h1>
+<img src="https://images.unsplash.com/photo-1605902711622-cfb43c4431e0?auto=format&fit=crop&w=500&q=80" alt="Beautiful romantic Valentine's scene with hearts and roses">
+<div id="proposal">Will you be my Valentine? 💖</div>
+<button id="yesBtn" onclick="showFinal()">Yes! 💕</button>
+<div id="finalMessage">I'm yours forever! 💖</div>
+
+<audio id="loveSong" loop>
+    <source src="https://www.bensound.com/bensound-music/bensound-romantic.mp3" type="audio/mpeg">
+    Your browser does not support audio.
+</audio>
+
+<canvas id="fireworks"></canvas>
+
+<script>
+const music = document.getElementById('loveSong');
+const welcomeMessage = document.getElementById('welcomeMessage');
+const countdownEl = document.getElementById('countdown');
+const musicPrompt = document.getElementById('musicPrompt');
+const title = document.querySelector('h1');
+const img = document.querySelector('img');
+
+let started = false;
+let heartCount = 0;
+const MAX_HEARTS = 30; // Limit background hearts for performance
+
+function startExperience() {
+    if (started) return;
+    started = true;
+
+    // Try to play music
+    music.play().catch(()=>{
+        // Show prompt if autoplay is blocked
+        musicPrompt.style.display = 'block';
+    });
+
+    // Hide welcome message
+    welcomeMessage.style.display = 'none';
+
+    // Start countdown
+    let countdown = 3;
+    countdownEl.style.display = 'block';
+    countdownEl.textContent = countdown;
+    const interval = setInterval(()=>{
+        countdown--;
+        if(countdown > 0){
+            countdownEl.textContent = countdown;
+        } else {
+            clearInterval(interval);
+            countdownEl.style.display='none';
+            // Show proposal
+            title.style.display = 'block';
+            img.style.display = 'block';
+            document.getElementById('proposal').style.display = 'block';
+            document.getElementById('yesBtn').style.display = 'inline-block';
+        }
+    }, 1000);
+
+    // Remove initial tap listeners
+    window.removeEventListener('click', initialTapHandler);
+    window.removeEventListener('touchstart', initialTapHandler);
+
+    // Add tap heart effect listeners
+    window.addEventListener('click', createTapHeart);
+    window.addEventListener('touchstart', createTapHeart);
+}
+
+// Music prompt handler
+musicPrompt.addEventListener('click', ()=>{
+    music.play();
+    musicPrompt.style.display = 'none';
+});
+
+// Floating hearts in background with limit
+function createHeart() {
+    if (heartCount >= MAX_HEARTS) return;
+    
+    heartCount++;
+    const heart = document.createElement('div');
+    heart.classList.add('heart');
+    heart.style.left = Math.random() * window.innerWidth + 'px';
+    heart.style.animationDuration = 4 + Math.random() * 3 + 's';
+    const size = 10 + Math.random() * 20;
+    heart.style.width = size + 'px';
+    heart.style.height = size + 'px';
+    
+    // Update pseudo-elements size
+    const hue = Math.random() * 60 + 330; // Red to pink range
+    heart.style.backgroundColor = `hsl(${hue},70%,60%)`;
+    
+    document.body.appendChild(heart);
+    setTimeout(() => {
+        heart.remove();
+        heartCount--;
+    }, 7000);
+}
+
+const heartInterval = setInterval(createHeart, 400);
+
+// Fireworks canvas
+const canvas = document.getElementById('fireworks');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let fireworks = [];
+let particles = [];
+
+class Firework {
+    constructor(x, y, targetY, color='') {
+        this.x = x; 
+        this.y = y; 
+        this.targetY = targetY;
+        this.speed = 4 + Math.random() * 2;
+        this.color = color || `hsl(${Math.random()*360},100%,50%)`;
+    }
+    update() {
+        this.y -= this.speed;
+        if(this.y <= this.targetY){
+            createHeartParticles(this.x, this.y);
+            return false;
+        }
+        return true;
+    }
+    draw(){ 
+        ctx.fillStyle = this.color; 
+        ctx.fillRect(this.x, this.y, 2, 10);
+    }
+}
+
+class Particle {
+    constructor(x, y, color, shape='circle'){
+        this.x = x; 
+        this.y = y; 
+        this.color = color;
+        this.speedX = (Math.random() - 0.5) * 6;
+        this.speedY = (Math.random() - 0.5) * 6;
+        this.alpha = 1;
+        this.shape = shape;
+        this.size = shape === 'heart' ? 8 : 3;
+    }
+    update(){ 
+        this.x += this.speedX; 
+        this.y += this.speedY; 
+        this.speedY += 0.1; // Gravity
+        this.alpha -= 0.015; 
+        return this.alpha > 0;
+    }
+    draw(){
+        ctx.globalAlpha = this.alpha;
+        ctx.fillStyle = this.color;
+        if(this.shape === 'heart'){
+            drawHeart(this.x, this.y, this.size, this.color);
+        } else {
+            ctx.fillRect(this.x, this.y, this.size, this.size);
+        }
+        ctx.globalAlpha = 1;
+    }
+}
+
+// Improved heart shape drawing
+function drawHeart(x, y, size, color){
+    ctx.save();
+    ctx.fillStyle = color;
+    ctx.translate(x, y);
+    ctx.scale(size / 10, size / 10);
+    
+    ctx.beginPath();
+    ctx.moveTo(0, 3);
+    ctx.bezierCurveTo(-5, -2, -10, 1, -5, 8);
+    ctx.bezierCurveTo(-3, 10, 0, 12, 0, 12);
+    ctx.bezierCurveTo(0, 12, 3, 10, 5, 8);
+    ctx.bezierCurveTo(10, 1, 5, -2, 0, 3);
+    ctx.closePath();
+    ctx.fill();
+    
+    ctx.restore();
+}
+
+// Create heart + confetti particles
+function createHeartParticles(x, y){
+    // Hearts
+    for(let i = 0; i < 20; i++){
+        let color = `hsl(${Math.random() * 60 + 330},100%,70%)`; // Red to pink
+        particles.push(new Particle(x, y, color, 'heart'));
+    }
+    // Confetti
+    for(let i = 0; i < 40; i++){
+        let color = `hsl(${Math.random() * 360},100%,70%)`;
+        particles.push(new Particle(x, y, color, 'circle'));
+    }
+}
+
+function animate(){
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    fireworks = fireworks.filter(f => f.update());
+    fireworks.forEach(f => f.draw());
+    particles = particles.filter(p => p.update());
+    particles.forEach(p => p.draw());
+    requestAnimationFrame(animate);
+}
+animate();
+
+function showFinal(){
+    document.getElementById('finalMessage').style.display = 'block';
+    
+    // Launch fireworks celebration
+    for(let i = 0; i < 20; i++){
+        setTimeout(() => {
+            fireworks.push(new Firework(
+                Math.random() * canvas.width, 
+                canvas.height, 
+                Math.random() * canvas.height / 2
+            ));
+        }, i * 200);
+    }
+    
+    setTimeout(() => {
+        alert("You said YES! 💖");
+    }, 500);
+}
+
+// Create tap heart effect
+function createTapHeart(e) {
+    e.preventDefault();
+    const heart = document.createElement('div');
+    heart.classList.add('heart');
+    const x = e.clientX || (e.touches && e.touches[0].clientX);
+    const y = e.clientY || (e.touches && e.touches[0].clientY);
+    heart.style.left = x - 10 + 'px';
+    heart.style.top = y - 10 + 'px';
+    heart.style.width = '20px';
+    heart.style.height = '20px';
+    const hue = Math.random() * 60 + 330;
+    heart.style.backgroundColor = `hsl(${hue},70%,60%)`;
+    document.body.appendChild(heart);
+    setTimeout(() => heart.remove(), 2000);
+}
+
+// Initial tap handler
+function initialTapHandler(e) {
+    startExperience();
+    createTapHeart(e);
+}
+
+window.addEventListener('click', initialTapHandler);
+window.addEventListener('touchstart', initialTapHandler);
+
+window.addEventListener('resize', () => { 
+    canvas.width = window.innerWidth; 
+    canvas.height = window.innerHeight; 
+});
+
+// Keyboard accessibility
+document.getElementById('yesBtn').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+        showFinal();
+    }
+});
+</script>
+
+</body>
+</html>
