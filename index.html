@@ -8,7 +8,9 @@
 body {
     margin: 0;
     padding: 0;
-    background: linear-gradient(to bottom right, #ffcccc, #ff99cc);
+    background: linear-gradient(45deg, #ffcccc, #ff99cc, #ffccff, #ff99cc);
+    background-size: 400% 400%;
+    animation: gradientShift 15s ease infinite;
     font-family: 'Arial', sans-serif;
     overflow: hidden;
     display: flex;
@@ -21,30 +23,56 @@ body {
     touch-action: none;
 }
 
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
 #welcomeMessage, #countdown {
     position: absolute;
     top: 30%;
     font-size: 2em;
     color: #ff0066;
-    text-shadow: 2px 2px 10px #fff;
+    text-shadow: 2px 2px 10px #fff, 0 0 20px #ff99cc;
     opacity: 0;
-    animation: fadeIn 2s forwards;
+    animation: fadeIn 2s forwards, pulse 2s infinite;
     z-index: 5;
 }
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
 h1 {
     color: #ff0066;
     font-size: 3em;
     margin-bottom: 20px;
     cursor: pointer;
-    text-shadow: 2px 2px 10px #fff;
+    text-shadow: 2px 2px 10px #fff, 0 0 30px #ff3366;
     display: none;
+    animation: bounce 2s infinite;
 }
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+    40% { transform: translateY(-20px); }
+    60% { transform: translateY(-10px); }
+}
+
 img {
     width: 300px;
     border-radius: 20px;
     margin-bottom: 20px;
     box-shadow: 0px 0px 30px #ff99cc;
     display: none;
+    animation: imageFloat 3s ease-in-out infinite;
+}
+
+@keyframes imageFloat {
+    0%, 100% { transform: translateY(0px) scale(1); }
+    50% { transform: translateY(-15px) scale(1.02); }
 }
 
 #proposal {
@@ -52,7 +80,12 @@ img {
     font-size: 2em;
     color: #ff0066;
     margin-top: 20px;
-    animation: fadeIn 2s forwards;
+    animation: fadeIn 2s forwards, textGlow 2s infinite;
+}
+
+@keyframes textGlow {
+    0%, 100% { text-shadow: 0 0 10px #ff99cc, 0 0 20px #ff3366; }
+    50% { text-shadow: 0 0 20px #ff3366, 0 0 40px #ff0066; }
 }
 
 .button-container {
@@ -72,15 +105,30 @@ img {
     border-radius: 10px;
     cursor: pointer;
     transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
 }
 
 #yesBtn {
     background-color: #ff3366;
+    animation: buttonPulse 1.5s infinite;
+}
+
+@keyframes buttonPulse {
+    0%, 100% { box-shadow: 0 0 20px #ff3366; }
+    50% { box-shadow: 0 0 40px #ff0066, 0 0 60px #ff99cc; }
 }
 
 #yesBtn:hover { 
     background-color: #ff6699;
-    transform: scale(1.1);
+    transform: scale(1.15) rotate(5deg);
+    animation: buttonShake 0.5s infinite, buttonPulse 1.5s infinite;
+}
+
+@keyframes buttonShake {
+    0%, 100% { transform: scale(1.15) rotate(5deg); }
+    25% { transform: scale(1.15) rotate(-5deg); }
+    75% { transform: scale(1.15) rotate(5deg); }
 }
 
 #noBtn {
@@ -99,7 +147,13 @@ img {
     color: #ff0066;
     margin-top: 20px;
     text-shadow: 2px 2px 10px #fff;
-    animation: fadeIn 2s forwards;
+    animation: fadeIn 2s forwards, celebration 1s infinite;
+}
+
+@keyframes celebration {
+    0%, 100% { transform: scale(1) rotate(0deg); }
+    25% { transform: scale(1.1) rotate(-5deg); }
+    75% { transform: scale(1.1) rotate(5deg); }
 }
 
 .puzzle-modal {
@@ -113,16 +167,28 @@ img {
     z-index: 1000;
     justify-content: center;
     align-items: center;
+    animation: fadeIn 0.5s forwards;
 }
 
 .puzzle-content {
-    background: linear-gradient(135deg, #ff99cc, #ffcccc);
+    background: linear-gradient(135deg, #ff99cc, #ffcccc, #ff99cc);
+    background-size: 200% 200%;
+    animation: gradientMove 3s ease infinite, float 3s ease-in-out infinite;
     padding: 40px;
     border-radius: 20px;
     box-shadow: 0 0 50px rgba(255, 51, 102, 0.5);
     max-width: 500px;
     width: 90%;
-    animation: slideIn 0.5s forwards;
+}
+
+@keyframes gradientMove {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
 }
 
 .puzzle-title {
@@ -130,6 +196,12 @@ img {
     color: #ff0066;
     margin-bottom: 20px;
     text-shadow: 2px 2px 5px rgba(255, 255, 255, 0.5);
+    animation: titleBounce 1s infinite;
+}
+
+@keyframes titleBounce {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
 }
 
 .puzzle-hint {
@@ -137,6 +209,7 @@ img {
     color: #ff3366;
     margin: 20px 0;
     line-height: 1.6;
+    animation: fadeIn 1s forwards;
 }
 
 .puzzle-input {
@@ -148,6 +221,13 @@ img {
     margin: 20px 0;
     text-align: center;
     text-transform: uppercase;
+    transition: all 0.3s ease;
+}
+
+.puzzle-input:focus {
+    border-color: #ff0066;
+    box-shadow: 0 0 20px #ff99cc;
+    transform: scale(1.05);
 }
 
 .puzzle-submit {
@@ -159,33 +239,46 @@ img {
     border-radius: 10px;
     cursor: pointer;
     transition: all 0.3s ease;
+    animation: buttonGlow 2s infinite;
+}
+
+@keyframes buttonGlow {
+    0%, 100% { box-shadow: 0 0 10px #ff3366; }
+    50% { box-shadow: 0 0 30px #ff0066; }
 }
 
 .puzzle-submit:hover {
     background-color: #ff6699;
-    transform: scale(1.05);
+    transform: scale(1.1) rotate(2deg);
 }
 
 .secret-message {
     display: none;
     font-size: 1.5em;
     color: #fff;
-    background: linear-gradient(45deg, #ff0066, #ff3366);
+    background: linear-gradient(45deg, #ff0066, #ff3366, #ff0066);
+    background-size: 200% 200%;
+    animation: messageGradient 3s ease infinite;
     padding: 30px;
     border-radius: 15px;
     margin-top: 20px;
     line-height: 1.8;
-    animation: glow 2s infinite;
 }
 
-@keyframes glow {
-    0%, 100% { box-shadow: 0 0 20px #ff3366; }
-    50% { box-shadow: 0 0 40px #ff0066; }
+@keyframes messageGradient {
+    0%, 100% { 
+        background-position: 0% 50%; 
+        box-shadow: 0 0 20px #ff3366, 0 0 40px #ff0066;
+    }
+    50% { 
+        background-position: 100% 50%; 
+        box-shadow: 0 0 40px #ff0066, 0 0 60px #ff3366;
+    }
 }
 
 @keyframes slideIn {
-    from { transform: scale(0.5); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
+    from { transform: scale(0.5) rotate(-10deg); opacity: 0; }
+    to { transform: scale(1) rotate(0deg); opacity: 1; }
 }
 
 .wrong-answer {
@@ -193,25 +286,69 @@ img {
     font-size: 1.1em;
     margin-top: 10px;
     display: none;
+    animation: shake 0.5s;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-10px); }
+    75% { transform: translateX(10px); }
 }
 
 .popup {
     position: fixed;
-    background: white;
+    background: linear-gradient(135deg, white, #ffe6f0);
     padding: 20px 30px;
     border-radius: 15px;
     box-shadow: 0 5px 25px rgba(0, 0, 0, 0.3);
     z-index: 999;
-    animation: popupBounce 0.5s ease;
+    animation: popupBounce 0.5s ease, popupFloat 2s ease-in-out infinite;
     font-size: 1.3em;
     color: #ff0066;
     font-weight: bold;
 }
 
 @keyframes popupBounce {
-    0% { transform: scale(0); }
-    50% { transform: scale(1.1); }
-    100% { transform: scale(1); }
+    0% { transform: scale(0) rotate(-180deg); }
+    50% { transform: scale(1.2) rotate(10deg); }
+    100% { transform: scale(1) rotate(0deg); }
+}
+
+@keyframes popupFloat {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+}
+
+.confetti {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background-color: #ff3366;
+    animation: confettiFall linear infinite;
+    pointer-events: none;
+    z-index: 100;
+}
+
+@keyframes confettiFall {
+    0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+}
+
+.sparkle {
+    position: absolute;
+    width: 5px;
+    height: 5px;
+    background: white;
+    border-radius: 50%;
+    animation: sparkleAnim 1s ease-out forwards;
+    pointer-events: none;
+    z-index: 50;
+}
+
+@keyframes sparkleAnim {
+    0% { transform: scale(0); opacity: 1; }
+    50% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(0); opacity: 0; }
 }
 
 @keyframes fadeIn {
@@ -245,8 +382,21 @@ img {
 .heart::after { left: 10px; top: 0; }
 
 @keyframes floatUp {
-    0% { transform: translateY(0) rotate(-45deg); opacity: 1;}
-    100% { transform: translateY(-100vh) rotate(-45deg); opacity: 0;}
+    0% { transform: translateY(0) rotate(-45deg) scale(1); opacity: 1;}
+    100% { transform: translateY(-100vh) rotate(-45deg) scale(0.5); opacity: 0;}
+}
+
+.emoji-float {
+    position: absolute;
+    font-size: 2em;
+    animation: emojiRise 4s ease-in forwards;
+    pointer-events: none;
+    z-index: 50;
+}
+
+@keyframes emojiRise {
+    0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
 }
 
 canvas { position: absolute; top: 0; left: 0; z-index: 10; pointer-events: none; }
@@ -340,23 +490,62 @@ const noPopups = [
     "You're breaking my heart! 💔"
 ];
 
+function createConfetti() {
+    const confetti = document.createElement('div');
+    confetti.className = 'confetti';
+    confetti.style.left = Math.random() * window.innerWidth + 'px';
+    confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 70%, 60%)`;
+    confetti.style.animationDuration = 3 + Math.random() * 2 + 's';
+    confetti.style.width = 5 + Math.random() * 10 + 'px';
+    confetti.style.height = 5 + Math.random() * 10 + 'px';
+    document.body.appendChild(confetti);
+    setTimeout(() => confetti.remove(), 5000);
+}
+
+function createSparkle(x, y) {
+    for (let i = 0; i < 8; i++) {
+        const sparkle = document.createElement('div');
+        sparkle.className = 'sparkle';
+        sparkle.style.left = x + 'px';
+        sparkle.style.top = y + 'px';
+        sparkle.style.animationDelay = i * 0.1 + 's';
+        document.body.appendChild(sparkle);
+        setTimeout(() => sparkle.remove(), 1000);
+    }
+}
+
+function createFloatingEmoji() {
+    const emojis = ['💕', '💖', '💗', '💘', '💝', '💞', '❤️', '🌹', '✨', '⭐'];
+    const emoji = document.createElement('div');
+    emoji.className = 'emoji-float';
+    emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+    emoji.style.left = Math.random() * window.innerWidth + 'px';
+    emoji.style.bottom = '0px';
+    emoji.style.animationDuration = 3 + Math.random() * 2 + 's';
+    document.body.appendChild(emoji);
+    setTimeout(() => emoji.remove(), 5000);
+}
+
+setInterval(createConfetti, 200);
+setInterval(createFloatingEmoji, 800);
+
 function startExperience() {
     if (started) return;
     started = true;
 
-    music.play().catch(()=>{});
+    music.play().catch(() => {});
     welcomeMessage.style.display = 'none';
 
     let countdown = 3;
     countdownEl.style.display = 'block';
     countdownEl.textContent = countdown;
-    const interval = setInterval(()=>{
+    const interval = setInterval(() => {
         countdown--;
-        if(countdown > 0){
+        if (countdown > 0) {
             countdownEl.textContent = countdown;
         } else {
             clearInterval(interval);
-            countdownEl.style.display='none';
+            countdownEl.style.display = 'none';
             title.style.display = 'block';
             img.style.display = 'block';
             document.getElementById('proposal').style.display = 'block';
@@ -372,7 +561,7 @@ function showPopup(message) {
     popup.style.left = Math.random() * (window.innerWidth - 200) + 'px';
     popup.style.top = Math.random() * (window.innerHeight - 100) + 'px';
     document.body.appendChild(popup);
-    
+
     setTimeout(() => {
         popup.style.animation = 'fadeOut 0.5s forwards';
         setTimeout(() => popup.remove(), 500);
@@ -381,21 +570,21 @@ function showPopup(message) {
 
 function moveButton() {
     noClickCount++;
-    
+
     const randomPopup = noPopups[Math.floor(Math.random() * noPopups.length)];
     showPopup(randomPopup);
-    
+
     const newSize = 1.8 + (noClickCount * 0.3);
     yesBtn.style.fontSize = newSize + 'em';
-    
+
     const maxX = window.innerWidth - 200;
     const maxY = window.innerHeight - 100;
     const randomX = Math.random() * maxX;
     const randomY = Math.random() * maxY;
-    
+
     noBtn.style.left = randomX + 'px';
     noBtn.style.top = randomY + 'px';
-    
+
     const messages = [
         "No 😢",
         "Are you sure? 🥺",
@@ -407,7 +596,7 @@ function moveButton() {
         "I'm begging! 🙏",
         "Pretty please? 🥹"
     ];
-    
+
     if (noClickCount < messages.length) {
         noBtn.textContent = messages[noClickCount];
     } else {
@@ -424,17 +613,25 @@ function checkPuzzle() {
         document.querySelector('.puzzle-submit').style.display = 'none';
         document.querySelector('.puzzle-hint').style.display = 'none';
         secretMessage.style.display = 'block';
-        
-        for(let i=0;i<25;i++){
+
+        for (let i = 0; i < 100; i++) {
+            setTimeout(createConfetti, i * 30);
+        }
+
+        for (let i = 0; i < 25; i++) {
             setTimeout(() => {
-                fireworks.push(new Firework(Math.random()*canvas.width, canvas.height, Math.random()*canvas.height/2));
+                fireworks.push(new Firework(Math.random() * canvas.width, canvas.height, Math.random() * canvas.height / 2));
             }, i * 150);
         }
     } else {
         wrongAnswer.style.display = 'block';
         puzzleInput.value = '';
         puzzleInput.style.borderColor = '#ff0066';
+        puzzleInput.style.animation = 'shake 0.5s';
         showPopup("Not quite! Keep trying! 💭");
+        setTimeout(() => {
+            puzzleInput.style.animation = '';
+        }, 500);
     }
 }
 
@@ -451,7 +648,7 @@ function createHeart() {
     heart.style.animationDuration = 4 + Math.random() * 3 + 's';
     heart.style.width = 10 + Math.random() * 20 + 'px';
     heart.style.height = heart.style.width;
-    heart.style.backgroundColor = `hsl(${Math.random()*360},70%,60%)`;
+    heart.style.backgroundColor = `hsl(${Math.random() * 360}, 70%, 60%)`;
     document.body.appendChild(heart);
     setTimeout(() => heart.remove(), 7000);
 }
@@ -466,113 +663,135 @@ let fireworks = [];
 let particles = [];
 
 class Firework {
-    constructor(x, y, targetY, color='') {
-        this.x=x; this.y=y; this.targetY=targetY;
-        this.speed=4+Math.random()*2;
-        this.color = color || `hsl(${Math.random()*360},100%,50%)`;
+    constructor(x, y, targetY, color = '') {
+        this.x = x;
+        this.y = y;
+        this.targetY = targetY;
+        this.speed = 4 + Math.random() * 2;
+        this.color = color || `hsl(${Math.random() * 360}, 100%, 50%)`;
     }
     update() {
-        this.y-=this.speed;
-        if(this.y<=this.targetY){
+        this.y -= this.speed;
+        if (this.y <= this.targetY) {
             createHeartParticles(this.x, this.y);
             return false;
         }
         return true;
     }
-    draw(){ ctx.fillStyle=this.color; ctx.fillRect(this.x,this.y,2,10);}
+    draw() {
+        ctx.fillStyle = this.color;
+        ctx.fillRect(this.x, this.y, 2, 10);
+    }
 }
 
 class Particle {
-    constructor(x,y,color,shape='circle'){
-        this.x=x; this.y=y; this.color=color;
-        this.speedX=(Math.random()-0.5)*6;
-        this.speedY=(Math.random()-0.5)*6;
-        this.alpha=1;
+    constructor(x, y, color, shape = 'circle') {
+        this.x = x;
+        this.y = y;
+        this.color = color;
+        this.speedX = (Math.random() - 0.5) * 6;
+        this.speedY = (Math.random() - 0.5) * 6;
+        this.alpha = 1;
         this.shape = shape;
     }
-    update(){ this.x+=this.speedX; this.y+=this.speedY; this.alpha-=0.02; return this.alpha>0;}
-    draw(){
-        ctx.globalAlpha=this.alpha;
-        ctx.fillStyle=this.color;
-        if(this.shape==='heart'){
-            drawHeart(this.x,this.y,5,this.color);
+    update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+        this.alpha -= 0.02;
+        return this.alpha > 0;
+    }
+    draw() {
+        ctx.globalAlpha = this.alpha;
+        ctx.fillStyle = this.color;
+        if (this.shape === 'heart') {
+            drawHeart(this.x, this.y, 5, this.color);
         } else {
-            ctx.fillRect(this.x,this.y,3,3);
+            ctx.fillRect(this.x, this.y, 3, 3);
         }
-        ctx.globalAlpha=1;
+        ctx.globalAlpha = 1;
     }
 }
 
-function drawHeart(x, y, size, color){
+function drawHeart(x, y, size, color) {
     ctx.save();
     ctx.translate(x, y);
-    ctx.rotate(-Math.PI/4);
+    ctx.rotate(-Math.PI / 4);
     ctx.fillStyle = color;
     ctx.beginPath();
-    ctx.moveTo(0,0);
-    ctx.fillRect(0,0,size,size);
-    ctx.fillRect(-size,0,size,size);
-    ctx.arc(-size/2, -size/2, size/2, 0, Math.PI*2);
-    ctx.arc(size/2, -size/2, size/2, 0, Math.PI*2);
+    ctx.moveTo(0, 0);
+    ctx.fillRect(0, 0, size, size);
+    ctx.fillRect(-size, 0, size, size);
+    ctx.arc(-size / 2, -size / 2, size / 2, 0, Math.PI * 2);
+    ctx.arc(size / 2, -size / 2, size / 2, 0, Math.PI * 2);
     ctx.fill();
     ctx.restore();
 }
 
-function createHeartParticles(x, y){
-    for(let i=0;i<30;i++){
-        let color = `hsl(${Math.random()*360},100%,70%)`;
-        particles.push(new Particle(x,y,color,'heart'));
+function createHeartParticles(x, y) {
+    for (let i = 0; i < 30; i++) {
+        let color = `hsl(${Math.random() * 360}, 100%, 70%)`;
+        particles.push(new Particle(x, y, color, 'heart'));
     }
-    for(let i=0;i<50;i++){
-        let color = `hsl(${Math.random()*360},100%,70%)`;
-        particles.push(new Particle(x,y,color,'circle'));
+    for (let i = 0; i < 50; i++) {
+        let color = `hsl(${Math.random() * 360}, 100%, 70%)`;
+        particles.push(new Particle(x, y, color, 'circle'));
     }
 }
 
-function animate(){
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    fireworks = fireworks.filter(f=>f.update());
-    fireworks.forEach(f=>f.draw());
-    particles = particles.filter(p=>p.update());
-    particles.forEach(p=>p.draw());
+function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    fireworks = fireworks.filter(f => f.update());
+    fireworks.forEach(f => f.draw());
+    particles = particles.filter(p => p.update());
+    particles.forEach(p => p.draw());
     requestAnimationFrame(animate);
 }
-anime();
+animate();
 
-function showFinal(){
+function showFinal() {
     buttonContainer.style.display = 'none';
-    document.getElementById('finalMessage').style.display='block';
-    document.getElementById('proposal').style.display='none';
-    
-    for(let i=0;i<15;i++){
+    document.getElementById('finalMessage').style.display = 'block';
+    document.getElementById('proposal').style.display = 'none';
+
+    for (let i = 0; i < 200; i++) {
+        setTimeout(createConfetti, i * 20);
+    }
+
+    for (let i = 0; i < 15; i++) {
         setTimeout(() => {
-            fireworks.push(new Firework(Math.random()*canvas.width, canvas.height, Math.random()*canvas.height/2));
+            fireworks.push(new Firework(Math.random() * canvas.width, canvas.height, Math.random() * canvas.height / 2));
         }, i * 200);
     }
-    
+
     setTimeout(() => {
         puzzleModal.style.display = 'flex';
     }, 2000);
 }
 
-function tapHeart(e){
+function tapHeart(e) {
     startExperience();
     const heart = document.createElement('div');
     heart.classList.add('heart');
     const x = e.clientX || e.touches[0].clientX;
     const y = e.clientY || e.touches[0].clientY;
+    
+    createSparkle(x, y);
+    
     heart.style.left = x - 10 + 'px';
     heart.style.top = y - 10 + 'px';
     heart.style.width = '20px';
     heart.style.height = '20px';
-    heart.style.backgroundColor = `hsl(${Math.random()*360},70%,60%)`;
+    heart.style.backgroundColor = `hsl(${Math.random() * 360}, 70%, 60%)`;
     document.body.appendChild(heart);
-    setTimeout(()=>heart.remove(),2000);
+    setTimeout(() => heart.remove(), 2000);
 }
 
 window.addEventListener('click', tapHeart);
 window.addEventListener('touchstart', tapHeart);
-window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
+window.addEventListener('resize', () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+});
 </script>
 
 </body>
